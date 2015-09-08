@@ -1,4 +1,4 @@
-# Tiny dnsmasq server IP/FQDN maps
+# Tiny dnsmasq server IP/FQDN maps [![Build Status](https://travis-ci.org/javiervivanco/docker-dns.svg)](https://travis-ci.org/javiervivanco/docker-dns)
 
 Return IP for a specific FQDN or subdomain
 
