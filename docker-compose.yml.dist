@@ -1,0 +1,8 @@
+dns:
+    image: javier/docker-dns
+    command: -A /.docker/127.1.1.1 -A /.dev.server/1.2.3.4 -A /.dev.qa/1.2.3.3
+    ports:
+        - '0.0.0.0:53:53/udp'
+    extra_hosts:
+     - "somehost:162.242.195.82"
+     - "otherhost:50.31.209.229"

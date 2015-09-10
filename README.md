@@ -2,28 +2,29 @@
 
 Return IP for a specific FQDN or subdomain
 
-## Example dnsmasq.conf
+## Example docker-compose.yml
 
-    address=/.server-dev.docker/10.11.12.13
-    address=/.site1.server-dev.docker/10.12.14.16
-    address=/.docker/172.17.42.1
+    dns:
+        image: javier/docker-dns
+        command: -A /.docker/127.1.1.1 -A /.dev.server/1.2.3.4 -A /.dev.qa/1.2.3.3
+        ports:
+            - '0.0.0.0:53:53/udp'
+        extra_hosts:
+         - "somehost:162.242.195.82"
+         - "otherhost:50.31.209.229"
 
-    listen-address=0.0.0.0
-    interface=lo
-    interface=eth0
-    interface=docker0
 
 
 ## Example use
 
 Modified your dnsmasq.conf.dist to dnsmasq.conf
+  
+    docker run -d -p '0.0.0.0:53:53/udp'  javiervivanco/docker-dns -A /.docker/127.0.0.1 -A /.mydev/127.0.0.2
 
-    docker run -d -p '0.0.0.0:53:53/udp' -v $PWD/dnsmasq.conf.d/:/etc/  javiervivanco/docker-dns 
 
+    #$ dig @127.0.0.1 my.host.mydev
 
-    #$ dig @127.0.0.1 my.host.dev
-
-    ; <<>> DiG 9.9.5-3ubuntu0.2-Ubuntu <<>> @127.0.0.1 my.host.dev
+    ; <<>> DiG 9.9.5-3ubuntu0.2-Ubuntu <<>> @127.0.0.1 my.host.mydev
     ; (1 server found)
     ;; global options: +cmd
     ;; Got answer:
@@ -31,32 +32,22 @@ Modified your dnsmasq.conf.dist to dnsmasq.conf
     ;; flags: qr aa rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 
     ;; QUESTION SECTION:
-    ;my.host.dev.           IN  A
+    ;my.host.mydev.           IN  A
 
     ;; ANSWER SECTION:
-    my.host.dev.        0   IN  A   172.17.42.1
+    my.host.mydev.        0   IN  A   127.0.0.2
 
     ;; Query time: 1 msec
     ;; SERVER: 127.0.0.1#53(127.0.0.1)
     ;; WHEN: Tue Sep 08 16:42:35 ART 2015
     ;; MSG SIZE  rcvd: 45
     
-    #$ dig @127.0.0.1 site1.server-dev.docker
+   
+## DNS on ubuntu or debian 
 
-    ; <<>> DiG 9.9.5-3ubuntu0.2-Ubuntu <<>> @127.0.0.1 site1.server-dev.docker
-    ; (1 server found)
-    ;; global options: +cmd
-    ;; Got answer:
-    ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 43789
-    ;; flags: qr aa rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+If you want to have access in your local machine to the DNS, please add in /etc/resolvconf/resolv.conf.d/head
 
-    ;; QUESTION SECTION:
-    ;site1.server-dev.docker.           IN  A
+    nameserver 127.0.0.1 
+    # Or IP of your container server
 
-    ;; ANSWER SECTION:
-    site1.server-dev.docker.        0   IN  A   10.12.14.16
 
-    ;; Query time: 1 msec
-    ;; SERVER: 127.0.0.1#53(127.0.0.1)
-    ;; WHEN: Tue Sep 08 16:42:35 ART 2015
-    ;; MSG SIZE  rcvd: 45
